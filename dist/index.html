@@ -48,27 +48,8 @@
   <div class="swagger-ui-wrap">
     <a id="logo" href="http://swagger.wordnik.com">swagger</a>
     <form id='api_selector'>
-      <div class='input'>
-        <select id="input_environment" name="environment">
-          <option value="http://test1.service.daveramsey.com" selected>Test 1 - Private Service</option>
-          <option value="http://test2.service.daveramsey.com">Test 2 - Private Service</option>
-          <option value="http://test3.service.daveramsey.com">Test 3 - Private Service</option>
-          <option value="http://qa.service.daveramsey.com">QA - Private Service</option>
-          <option value="http://stage.service.daveramsey.com">Stage - Private Service</option>
-          <option value="http://service.daveramsey.com">Production - Private Service</option>
-          <option value="http://service.thfh.tv">AWS - Test - Nicocloudamus</option>
-        </select>
-      </div>
-      <div class='input'>
-        <select id="input_service" name="service">
-          <option value="/authx/api-docs" selected>AuthX</option>
-          <option value="/coatcheck/api-docs">Coatcheck</option>
-          <option value="/email/api-docs">Email</option>
-          <option value="/lead/api-docs">Lead</option>
-          <option value="/subscription/api-docs">Subscription</option>
-          <option value="/voucher/api-docs">Voucher</option>
-        </select>
-      </div>
+      <div class='input'><select id="input_service" name="service"></select></div>
+      <div class='input'><select id="input_environment" name="environment"></select></div>
       <div class='input'><input placeholder="http://service.daveramsey.com/lead/api-docs" id="input_baseUrl" name="baseUrl" type="text"/></div>
       <div class='input'><a id="explore" href="#">Explore</a></div>
     </form>
@@ -76,17 +57,145 @@
 </div>
 
 <script type="text/javascript">
-  var updateUrlTextbox = function() {
-    $("#input_baseUrl").val($( "#input_environment" ).val() + $( "#input_service" ).val());
+
+  // Define All Swagger-Enabled Services
+  var services = [
+    {
+      name: "AuthX",
+      uri: "/authx/api-docs",
+      environments: [ "aws" ]
+    },
+
+    {
+      name: "Coatcheck",
+      uri: "/coatcheck/api-docs",
+      environments: [ "aws" ]
+    },
+
+    {
+      name: "Email",
+      uri: "/email/api-docs",
+      environments: [ "aws" ]
+    },
+
+    {
+      name: "Lead",
+      uri: "/lead/api-docs",
+      environments: [ "test1" ]
+    },
+
+    {
+      name: "Subscription",
+      uri: "/subscription/api-docs",
+      environments: [ "aws" ]
+    },
+
+    {
+      name: "Voucher",
+      uri: "/voucher/api-docs",
+      environments: [ "test1", "aws" ]
+    }
+  ]
+
+  // Define All Swagger-Enabled Environments
+  var environments = [
+    {
+      name: "AWS Test",
+      key: "aws",
+      uri: "http://service.thfh.tv"
+    },
+
+    {
+      name: "Test 1",
+      key: "test1",
+      uri: "http://test1.service.daveramsey.com"
+    }
+  ]
+
+  // Load the Service Selector
+  var updateServiceSelection = function() {
+    var serviceSelector = getServiceSelector();
+    clearSelector(serviceSelector);
+
+    for (var i = 0; i < services.length; i++) {
+      var service = services[i];
+      addOptionToSelector(serviceSelector, service.name, service.name);
+    }
+
+    updateUrlTextbox();
   }
 
-  $( "#input_environment" ).change(function() {
+  // Load the Environment Selector, based on the selected service
+  var updateEnvironmentSelection = function() {
+    var environmentSelector = getEnvironmentSelector();
+    var serviceSelector = getServiceSelector();
+    var service = getService(serviceSelector.val());
+    clearSelector(environmentSelector);
+
+    var validEnvironments = service.environments;
+    for (var i = 0; i < validEnvironments.length; i++) {
+      var environmentKey = validEnvironments[i];
+      var environment = getEnvironment(environmentKey);
+
+      addOptionToSelector(environmentSelector, environment.uri, environment.name);
+    }
+
+    updateUrlTextbox();
+  }
+
+  // Load the URL Textbox, based on the selected service and environment
+  var updateUrlTextbox = function() {
+    $("#input_baseUrl").val(getEnvironmentSelector().val() + getService(getServiceSelector().val()).uri);
+  }
+
+  // On update to the service selector
+  $("#input_service").change(function() {
+    updateUrlTextbox();
+    updateEnvironmentSelection();
+  });
+
+  // On update to the environment selector
+  $("#input_environment").change(function() {
     updateUrlTextbox();
   });
 
-  $( "#input_service" ).change(function() {
-    updateUrlTextbox();
-  });
+  // Misc
+  var getService = function(name) {
+    for (var i = 0; i < services.length; i++) {
+      if (services[i].name == name) {
+        return services[i];
+      }
+    }
+  }
+
+  var getEnvironment = function(key) {
+    for (var i = 0; i < environments.length; i++) {
+      if (environments[i].key == key) {
+        return environments[i];
+      }
+    }
+  }
+
+  var getServiceSelector = function() {
+    return $("#input_service");
+  }
+
+  var getEnvironmentSelector = function() {
+    return $("#input_environment");
+  }
+
+  var clearSelector = function(selector) {
+    selector.find('option').remove().end();
+  }
+
+  var addOptionToSelector = function(selector, value, label) {
+    selector.append("<option value=\"" + value + "\">" + label + "</option>");
+  }
+
+  // Initialize
+  updateServiceSelection();
+  updateEnvironmentSelection();
+  updateUrlTextbox();
 </script>
 
 <div id="message-bar" class="swagger-ui-wrap">&nbsp;</div>

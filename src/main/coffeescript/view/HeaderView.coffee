@@ -3,6 +3,8 @@ class HeaderView extends Backbone.View
     'click #show-pet-store-icon'    : 'showPetStore'
     'click #show-wordnik-dev-icon'  : 'showWordnikDev'
     'click #explore'                : 'showCustom'
+    'change #input_environment'     : 'showCustom'
+    'change #input_service'         : 'showCustom'
     'keyup #input_baseUrl'          : 'showCustomOnKeyup'
     'keyup #input_apiKey'           : 'showCustomOnKeyup'
   }
