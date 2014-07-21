@@ -19,9 +19,6 @@
   <script src='swagger-ui.js' type='text/javascript'></script>
   <script src='lib/highlight.7.3.pack.js' type='text/javascript'></script>
 
-  <!-- enabling this will enable oauth2 implicit scope support -->
-  <script src='lib/swagger-oauth.js' type='text/javascript'></script>
-
   <script type="text/javascript">
     $(function () {
       window.swaggerUi = new SwaggerUi({
@@ -31,15 +28,6 @@
       onComplete: function(swaggerApi, swaggerUi){
         log("Loaded SwaggerUI");
 
-        if(typeof initOAuth == "function") {
-          /*
-          initOAuth({
-            clientId: "your-client-id",
-            realm: "your-realms",
-            appName: "your-app-name"
-          });
-          */
-        }
         $('pre code').each(function(i, e) {
           hljs.highlightBlock(e)
         });
@@ -50,14 +38,6 @@
       docExpansion: "none"
     });
 
-    $('#input_apiKey').change(function() {
-      var key = $('#input_apiKey')[0].value;
-      log("key: " + key);
-      if(key && key.trim() != "") {
-        log("added key " + key);
-        window.authorizations.add("key", new ApiKeyAuthorization("api_key", key, "query"));
-      }
-    })
     window.swaggerUi.load();
   });
   </script>
@@ -68,12 +48,46 @@
   <div class="swagger-ui-wrap">
     <a id="logo" href="http://swagger.wordnik.com">swagger</a>
     <form id='api_selector'>
+      <div class='input'>
+        <select id="input_environment" name="environment">
+          <option value="http://test1.service.daveramsey.com" selected>Test 1 - Private Service</option>
+          <option value="http://test2.service.daveramsey.com">Test 2 - Private Service</option>
+          <option value="http://test3.service.daveramsey.com">Test 3 - Private Service</option>
+          <option value="http://qa.service.daveramsey.com">QA - Private Service</option>
+          <option value="http://stage.service.daveramsey.com">Stage - Private Service</option>
+          <option value="http://service.daveramsey.com">Production - Private Service</option>
+          <option value="http://service.thfh.tv">AWS - Test - Nicocloudamus</option>
+        </select>
+      </div>
+      <div class='input'>
+        <select id="input_service" name="service">
+          <option value="/authx/api-docs" selected>AuthX</option>
+          <option value="/coatcheck/api-docs">Coatcheck</option>
+          <option value="/email/api-docs">Email</option>
+          <option value="/lead/api-docs">Lead</option>
+          <option value="/subscription/api-docs">Subscription</option>
+          <option value="/voucher/api-docs">Voucher</option>
+        </select>
+      </div>
       <div class='input'><input placeholder="http://service.daveramsey.com/lead/api-docs" id="input_baseUrl" name="baseUrl" type="text"/></div>
-      <div class='input'><input placeholder="api_key" id="input_apiKey" name="apiKey" type="text"/></div>
       <div class='input'><a id="explore" href="#">Explore</a></div>
     </form>
   </div>
 </div>
+
+<script type="text/javascript">
+  var updateUrlTextbox = function() {
+    $("#input_baseUrl").val($( "#input_environment" ).val() + $( "#input_service" ).val());
+  }
+
+  $( "#input_environment" ).change(function() {
+    updateUrlTextbox();
+  });
+
+  $( "#input_service" ).change(function() {
+    updateUrlTextbox();
+  });
+</script>
 
 <div id="message-bar" class="swagger-ui-wrap">&nbsp;</div>
 <div id="swagger-ui-container" class="swagger-ui-wrap"></div>
