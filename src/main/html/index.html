@@ -22,7 +22,7 @@
   <script type="text/javascript">
     $(function () {
       window.swaggerUi = new SwaggerUi({
-      url: "http://service.daveramsey.com/lead/api-docs",
+      url: "",
       dom_id: "swagger-ui-container",
       supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
       onComplete: function(swaggerApi, swaggerUi){
@@ -50,7 +50,7 @@
     <form id='api_selector'>
       <div class='input'><select id="input_service" name="service"></select></div>
       <div class='input'><select id="input_environment" name="environment"></select></div>
-      <div class='input'><input placeholder="http://service.daveramsey.com/lead/api-docs" id="input_baseUrl" name="baseUrl" type="text"/></div>
+      <div class='input'><input placeholder="" id="input_baseUrl" name="baseUrl" type="text"/></div>
       <div class='input'><a id="explore" href="#">Explore</a></div>
     </form>
   </div>
@@ -58,59 +58,26 @@
 
 <script type="text/javascript">
 
-  // Define All Swagger-Enabled Services
-  var services = [
-    {
-      name: "AuthX",
-      uri: "/authx/api-docs",
-      environments: [ "aws" ]
-    },
+  var services = []
+  var environment = []
 
-    {
-      name: "Coatcheck",
-      uri: "/coatcheck/api-docs",
-      environments: [ "aws" ]
-    },
+  // Load the environments from the remote config
+  var loadEnvironmentsFromConfig = function() {
+    $.getJSON("http://devtools/environments.json", function(data) {
+      environments = data
+      console.log("Received environments: " + environments);
+      updateServiceSelection();
+      updateEnvironmentSelection();
+      getServiceSelector().trigger("change");
+    })
+  }
 
-    {
-      name: "Email",
-      uri: "/email/api-docs",
-      environments: [ "aws" ]
-    },
-
-    {
-      name: "Lead",
-      uri: "/lead/api-docs",
-      environments: [ "test1" ]
-    },
-
-    {
-      name: "Subscription",
-      uri: "/subscription/api-docs",
-      environments: [ "aws" ]
-    },
-
-    {
-      name: "Voucher",
-      uri: "/voucher/api-docs",
-      environments: [ "test1", "aws" ]
-    }
-  ]
-
-  // Define All Swagger-Enabled Environments
-  var environments = [
-    {
-      name: "AWS Test",
-      key: "aws",
-      uri: "http://service.thfh.tv"
-    },
-
-    {
-      name: "Test 1",
-      key: "test1",
-      uri: "http://test1.service.daveramsey.com"
-    }
-  ]
+  var loadServicesFromConfig = function() {
+    $.getJSON("http://devtools/services.json", function(data) {
+      services = data
+      loadEnvironmentsFromConfig()
+    })
+  }
 
   // Load the Service Selector
   var updateServiceSelection = function() {
@@ -150,8 +117,8 @@
 
   // On update to the service selector
   $("#input_service").change(function() {
-    updateUrlTextbox();
     updateEnvironmentSelection();
+    updateUrlTextbox();
   });
 
   // On update to the environment selector
@@ -193,9 +160,7 @@
   }
 
   // Initialize
-  updateServiceSelection();
-  updateEnvironmentSelection();
-  updateUrlTextbox();
+  loadServicesFromConfig();
 </script>
 
 <div id="message-bar" class="swagger-ui-wrap">&nbsp;</div>
