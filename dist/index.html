@@ -74,14 +74,9 @@
         console.log("Selecting Service based on URL param: " + selectService + ".");
         $("#input_service").val(selectService);
       }
-
-      updateEnvironmentSelection();
       getServiceSelector().trigger("change");
 
-      var currentEnvironment = window.location.protocol + "//" + window.location.host;
-      console.log("Setting to the current environment: " + currentEnvironment);
-      $("#input_environment").val(currentEnvironment);
-
+      updateEnvironmentSelection();
       getEnvironmentSelector().trigger("change");
     })
   }
@@ -120,6 +115,11 @@
 
       addOptionToSelector(environmentSelector, environment.uri, environment.name);
     }
+
+    var currentEnvironment = window.location.protocol + "//" + window.location.host;
+    console.log("Setting to the current environment: " + currentEnvironment);
+    $("#input_environment").val(currentEnvironment);
+    getEnvironmentSelector().trigger("change");
 
     updateUrlTextbox();
   }
