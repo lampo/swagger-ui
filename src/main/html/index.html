@@ -76,6 +76,11 @@
       }
 
       updateEnvironmentSelection();
+
+      var currentEnvironment = window.location.protocol + "//" + window.location.host;
+      console.log("Setting to the current environment: " + currentEnvironment);
+      $("#input_service").val(currentEnvironment);
+
       getServiceSelector().trigger("change");
     })
   }
